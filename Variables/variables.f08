@@ -41,4 +41,3 @@ program variables
     write(*,*) "max_parts = ", max_parts
     write(*,*) "balance = ", balance
 end program variables
-! Lesson 7
