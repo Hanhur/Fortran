@@ -5,4 +5,3 @@ program const
     x = sin(PI)
     write(*,*) x
 end program const
-!  Lesson 17
