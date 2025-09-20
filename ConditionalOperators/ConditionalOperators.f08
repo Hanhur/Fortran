@@ -32,21 +32,66 @@ program ConditionalOperators
 
     ! =====================================================================
 
-    integer :: age
+    ! integer :: age
 
-    write(*,*) "Input you age"
-    read(*,*) age
+    ! write(*,*) "Input you age"
+    ! read(*,*) age
 
-    if ( age <= 0 ) then
-        write(*,*) "Are you joking"
-    else if ( age <= 12 ) then
-        write(*,*) "You child"
-    else if ( age <= 60 ) then
-        write(*,*) "Ypu are an adult"
-    else if ( age <= 150 ) then
-        write(*,*) "Toy are elderly"
-    else
-        write(*,*) "Are you immortal?"
+    ! if ( age <= 0 ) then
+    !     write(*,*) "Are you joking"
+    ! else if ( age <= 12 ) then
+    !     write(*,*) "You child"
+    ! else if ( age <= 60 ) then
+    !     write(*,*) "Ypu are an adult"
+    ! else if ( age <= 150 ) then
+    !     write(*,*) "Toy are elderly"
+    ! else
+    !     write(*,*) "Are you immortal?"
+    ! end if
+
+    ! ===========================================================================
+
+    ! integer :: a, b
+
+    ! write(*,*) 'input a'
+    ! read(*,*) a
+
+    ! write(*,*) 'input b'
+    ! read(*,*) b
+
+    ! if(a ** 2 + b ** 2 > (a + b) ** 2) then
+    !     write(*,*) 'a**2 + b**2 > (a + b)**2'
+    ! else
+    !     write(*,*) '(a + b)**2 > a**2 + b**2'
+    ! end if
+
+    ! =============================================================================
+
+    integer :: n
+    logical :: is_lucky
+
+    is_lucky = .false.
+
+    write(*,*) "Input n"
+    read(*,*) n 
+
+    if(n / 100 == 7) then
+        is_lucky = .true.
     end if
+
+    if(mod(n, 100) / 10 == 7) then
+        is_lucky = .true.
+    end if
+
+    if(mod(n, 100) == 7) then
+        is_lucky = .true.
+    end if
+
+    if(is_lucky) then
+        write(*,*) 'is lucky'
+    else
+        write(*,*) 'not lucky'
+    end if
+
 end program ConditionalOperators
 ! Lesson 18
