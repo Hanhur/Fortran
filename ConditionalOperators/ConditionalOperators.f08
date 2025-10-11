@@ -67,31 +67,54 @@ program ConditionalOperators
 
     ! =============================================================================
 
-    integer :: n
-    logical :: is_lucky
+    ! integer :: n
+    ! logical :: is_lucky
 
-    is_lucky = .false.
+    ! is_lucky = .false.
 
-    write(*,*) "Input n"
-    read(*,*) n 
+    ! write(*,*) "Input n"
+    ! read(*,*) n 
 
-    if(n / 100 == 7) then
-        is_lucky = .true.
+    ! if(n / 100 == 7) then
+    !     is_lucky = .true.
+    ! end if
+
+    ! if(mod(n, 100) / 10 == 7) then
+    !     is_lucky = .true.
+    ! end if
+
+    ! if(mod(n, 100) == 7) then
+    !     is_lucky = .true.
+    ! end if
+
+    ! if(is_lucky) then
+    !     write(*,*) 'is lucky'
+    ! else
+    !     write(*,*) 'not lucky'
+    ! end if
+
+    ! =================================================================================
+
+    integer :: a, b, c, max_value
+
+    write(*,*) "input a"
+    read(*,*) a
+
+    write(*,*) "input b"
+    read(*,*) b
+
+    write(*,*) "input c"
+    read(*,*) c
+
+    max_value = a 
+    if (b > max_value) then
+        max_value = b
     end if
 
-    if(mod(n, 100) / 10 == 7) then
-        is_lucky = .true.
+    if (c > max_value) then
+        max_value = c
     end if
 
-    if(mod(n, 100) == 7) then
-        is_lucky = .true.
-    end if
-
-    if(is_lucky) then
-        write(*,*) 'is lucky'
-    else
-        write(*,*) 'not lucky'
-    end if
+    write(*,*) "Max = ", max_value
 
 end program ConditionalOperators
-! Lesson 18
