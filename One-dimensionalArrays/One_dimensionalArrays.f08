@@ -173,5 +173,3 @@ program One_dimensionalArrays
     write(*,*) arr
 
 end program One_dimensionalArrays
-
-! Lesson 40
