@@ -110,4 +110,3 @@ program ArraySlices
     write(*,*) "c = ", array_c
     
 end program ArraySlices
-! Lesson 42

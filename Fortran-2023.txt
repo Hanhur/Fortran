@@ -1,0 +1,486 @@
+===== Страница 1 =====
+
+Fortran 2023 для вас: возможности и инструменты
+
+Кэтрин Расмуссен, Дэмиан Русон
+
+Семинар NHR PerfLab, 10 марта 2025 г.
+
+===== Страница 2 =====
+
+01 Возможности Fortran 2023
+02 Инструменты для разработки на Fortran
+03 Сообщества разработчиков Fortran
+
+===== Страница 3 =====
+
+Возможности
+===== Страница 4 =====
+
+Подмножество возможностей языка Fortran
+
+Новые возможности стандартов Fortran 2003, 2008, 2018, 2023, ~2028
+
+Возможности, часто относимые к Modern Fortran, включают:
+
+Параллелизм на уровне циклов: do concurrent
+
+Параллелизм на основе образов (multi-image parallelism): ко-массивы и связанные процедуры (this_image, ucobound и т.д.)
+
+Коллективные и атомарные подпрограммы (co_sum, atomic_fetch_add и т.д.)
+
+Команды, блокировки и события (form-team-stmt, lock-stmt, event-post-stmt и т.д.)
+
+Полиморфизм
+
+Совместимость с C
+
+===== Страница 5 =====
+
+Ко-массивы и многое другое (коллективы, атомарные операции и т.д.)
+
+Параллелизм SPMD (один поток программы — множество данных)
+
+Использует абстракцию разделяемой памяти PGAS (разделенное глобальное адресное пространство)
+
+Библиотеки времени выполнения PRIF и Caffeine — нацелены на LLVM Flang и LFortran
+
+do concurrent
+
+Параллелизм на уровне циклов
+
+В настоящее время 3 компилятора (NVIDIA, Intel, HPE) поддерживают автоматический перенос на GPU
+
+Преимущества: проще в написании и потенциально быстрее в выполнении
+
+===== Страница 6 =====
+
+Полезные встроенные функции/возможности
+
+findloc() — Находит местоположение заданного значения в массиве (необязательный аргумент mask)
+
+pack() — Упаковывает массив в массив ранга один после применения маски
+
+count() — Подсчитывает истинные значения в массиве
+
+merge() — Объединяет переменные на основе логики аргумента mask
+
+index() — Находит позицию подстроки в строке
+
+Примечание: аргумент mask (логика на основе маски) встроенных функций
+
+Примечание: Комбинирование вызовов встроенных функций
+
+Больше встроенных функций с объяснениями здесь [ссылка, вероятно, была на слайде]
+
+===== Страница 7 =====
+
+Полезные встроенные функции — Пример — Сценарий использования
+
+Пример тестов Julienne (подробнее позже)
+
+Возможность: при запуске тестов можно передать флаг со строкой, который выбирает, какие тесты запускать: -- --contains <строка>
+
+===== Страница 8 =====
+
+Полезные встроенные функции — Пример — Сценарий использования
+
+Целевая строка
+
+Массив строк с описаниями тестов
+
+Необходимо найти подстроку в целевой строке
+
+Если найдена, запустить все тесты
+
+Если нет, найти подстроку в массиве строк с описаниями тестов и запустить только те тесты, где она встречается
+
+===== Страница 9 =====
+55 block
+56 integer i, m, num_descriptions, num_matches
+57 logical substring_in_subject
+58 logical, allocatable :: substring_in_description(:)
+59 character(len=:), allocatable :: test_subject
+60 num_descriptions = size(test_descriptions)
+61 test_subject = subject(:)
+62 substring_in_subject = .false.
+63 do i = 1, len(test_subject) - len(test_description_substring) + 1
+64 if (test_subject(i:i+len(test_description_substring) - 1) == test_description_substring) then
+65 substring_in_subject = .true.
+66 exit
+67 end if
+68 end do
+69 if (substring_in_subject) then
+70 allocate(test_results(num_descriptions))
+71 do i = 1, num_descriptions
+72 test_results = test_descriptions%run()
+73 end do
+74 else ! подстрока не найдена в теме
+75 allocate(substring_in_description(num_descriptions))
+76 num_matches = 0
+77 do i = 1, num_descriptions
+78 substring_in_description(i) = test_descriptions(i)%contains_text(test_description_substring)
+79 if (substring_in_description(i)) num_matches = num_matches + 1
+80 end do
+81 allocate(test_results(num_matches))
+82 m = 0
+83 do i = 1, num_descriptions
+84 if (m==num_matches) exit
+85 if (substring_in_description(i)) then
+86 m = m + 1
+87 test_results(m) = test_descriptions(i)%run()
+88 end if
+89 end do
+90 end if
+91 end block
+
+===== Страница 10 =====
+
+[Страница 10 содержит, по-видимому, испорченный или повторяющийся набор чисел, вероятно, из-за ошибки извлечения текста. По смыслу она дублирует содержание страницы 9 или 11. Пропускаем.]
+
+===== Страница 11 =====
+55 block
+56 integer i, m, num_descriptions, num_matches
+57 logical, allocatable :: substring_in_description()
+58 num_descriptions = size(test_descriptions)
+59 if (index(subject(), test_description_substring) /= 0) then
+60 allocate(test_results(num_descriptions))
+61 do i = 1, num_descriptions
+62 test_results = test_descriptions%run()
+63 end do
+64 else ! подстрока не найдена в теме
+65 allocate(substring_in_description(num_descriptions))
+66 num_matches = 0
+67 do i = 1, num_descriptions
+68 substring_in_description(i) = test_descriptions(i)%contains_text(test_description_substring)
+69 if (substring_in_description(i)) num_matches = num_matches + 1
+70 end do
+71 allocate(test_results(num_matches))
+72 m = 0
+73 do i = 1, num_descriptions
+74 if (m==num_matches) exit
+75 if (substring_in_description(i)) then
+76 m = m + 1
+77 test_results(m) = test_descriptions(i)%run()
+78 end if
+79 end do
+80 end if
+81 end block
+
+===== Страница 12 =====
+
+Версия на 27 строк
+55 block
+56 integer i, m, num_descriptions, num_matches
+57 logical, allocatable :: substring_in_description(:)
+58 num_descriptions = size(test_descriptions)
+59 if (index(subject(), test_description_substring) /= 0) then
+60 allocate(test_results(num_descriptions))
+61 do i = 1, num_descriptions
+62 test_results = test_descriptions%run()
+63 end do
+64 else ! подстрока не найдена в теме
+65 allocate(substring_in_description(num_descriptions))
+66 num_matches = 0
+67 do i = 1, num_descriptions
+68 substring_in_description(i) = test_descriptions(i)%contains_text(test_description_substring)
+69 if (substring_in_description(i)) num_matches = num_matches + 1
+70 end do
+71 allocate(test_results(num_matches))
+72 m = 0
+73 do i = 1, num_descriptions
+74 if (m==num_matches) exit
+75 if (substring_in_description(i)) then
+76 m = m + 1
+77 test_results(m) = test_descriptions(i)%run()
+78 end if
+79 end do
+80 end if
+81 end block
+
+===== Страница 13 =====
+55 block
+56 integer i, m, num_descriptions, num_matches
+57 logical, allocatable :: substring_in_description(:)
+58 num_descriptions = size(test_descriptions)
+59 if (index(subject(), test_description_substring) /= 0) then
+60 allocate(test_results(num_descriptions))
+61 do i = 1, num_descriptions
+62 test_results = test_descriptions%run()
+63 end do
+64 else ! подстрока не найдена в теме
+65 allocate(substring_in_description(num_descriptions))
+66 do i = 1, num_descriptions
+67 substring_in_description(i) = test_descriptions(i)%contains_text(test_description_substring)
+68 end do
+69 num_matches = count(substring_in_description)
+70 allocate(test_results(num_matches))
+71 m = 0
+72 do i = 1, num_descriptions
+73 if (m==num_matches) exit
+74 if (substring_in_description(i)) then
+75 m = m + 1
+76 test_results(m) = test_descriptions(m)%run()
+77 end if
+78 end do
+79 end if
+80 end block
+
+===== Страница 14 =====
+
+Версия на 26 строк
+
+===== Страница 15 =====
+
+Добавлен pack() — 12 строк (без учета пробельных символов)
+55 block
+56 integer i
+57 logical substring_in_subject
+58 logical, allocatable :: substring_in_description(:)
+59
+60 substring_in_subject = index(subject(), test_description_substring) /= 0
+61
+62 allocate(substring_in_description(size(test_descriptions)))
+63
+64 do i = 1, size(test_descriptions)
+65 substring_in_description(i) = test_descriptions(i)%contains_text(test_description_substring)
+66 end do
+67
+68 test_descriptions = pack(test_descriptions, substring_in_subject .or. substring_in_description)
+69 end block
+70 test_results = test_descriptions%run()
+
+===== Страница 16 =====
+
+Версия на 12 строк (без учета пробельных символов)
+
+[Код повторяет страницу 15]
+
+===== Страница 17 =====
+
+Объедините и используйте преимущество автоматического перевыделения памяти — ? строк
+
+===== Страница 18 =====
+
+Объедините и используйте преимущество автоматического перевыделения памяти — 2 строки
+
+===== Страница 19 =====
+
+Объедините и используйте преимущество автоматического перевыделения памяти
+
+===== Страница 20 =====
+
+Обзор полезных возможностей Fortran — Пример
+
+Возможности Fortran 95, использованные в примере:
+
+Встроенная функция pack
+
+Встроенная функция index
+
+Встроенная функция count (на промежуточном этапе)
+
+Автоматическое (пере)выделение массивов (F90-F2003)
+
+Элементарные связанные с типом процедуры — run()
+
+Чистая (pure) процедура
+
+Код из julienne/test/bin test.F90
+
+===== Страница 21 =====
+
+Инструменты
+===== Страница 22 =====
+
+fpm (Fortran Package Manager — Менеджер пакетов Fortran)
+
+fpm (Fortran Package Manager)
+
+Менеджер пакетов и система сборки
+
+Написан на Fortran
+
+Поддерживается сообществом разработчиков Fortran
+
+Автоматически определяет зависимости файлов
+
+Поддерживает исходный код как на Fortran, так и на C
+
+Сам fpm очень легко установить
+
+Доступен через менеджеры пакетов (Homebrew и др.) При использовании gfortran13, можно также скомпилировать однофайловую версию исходного кода fpm для его установки
+
+===== Страница 23 =====
+
+Разработка через тестирование
+
+Преимущества модульных тестов
+
+Julienne
+
+Легковесный фреймворк для модульного тестирования
+
+Вывод тестов можно читать как спецификацию
+
+Предоставляет диагностическую информацию о сбоях
+
+Assert
+
+Утилита, помогающая проверять ограничения
+
+Полезный диагностический вывод из чистых (pure) процедур
+
+===== Страница 24 =====
+
+Создайте новый проект fpm с помощью fpm new имя_проекта
+
+Добавьте зависимость от Julienne в файл fpm.toml
+
+Скопируйте пример из julienne/example/example-project в новый проект fpm
+
+Переместите specimen_m.f90 в каталог src
+
+Запустите тесты с помощью fpm test
+
+Исправьте преднамеренную ошибку в исходном коде, чтобы тест проходил
+
+===== Страница 25 =====
+
+[Пустая страница?]
+
+===== Страница 26 =====
+
+Добавьте тест для новой функции increment()
+70 function check_increment() result(test_diagnosis)
+71 type(test_diagnosis_t) test_diagnosis
+72 type(specimen_t) specimen
+73 integer, parameter :: expected_result = 8
+74 integer :: actual_result
+75
+76 actual_result = specimen%increment(7)
+77 test_diagnosis = test_diagnosis_t( &
+78 test_passed = actual_result == expected_result, &
+79 diagnostics_string = "expected result " // string_t(expected_result) &
+80 //", actual result " // string_t(actual_result))
+81
+82 end function
+
+===== Страница 27 =====
+
+Обновите функцию results(), чтобы вызывать новый тест
+
+===== Страница 28 =====
+6 program main
+7 use julienne_m, only : command_line_t
+8 use specimen_test_m, only : specimen_test_t
+9 implicit none
+10
+11 type(specimen_test_t) specimen_test
+12 integer :: passes=0, tests=0
+13
+14 call print_usage_and_stop_if_help_requested
+15 call specimen_test%report(passes, tests)
+16 call report_tally_and_error_stop_if_test_fails
+
+===== Страница 29 =====
+
+Влияние машинного обучения и ИИ на высокопроизводительные вычисления (HPC)
+
+Fiats (Функциональный вывод и обучение для суррогатных моделей)
+
+Альтернативное название: Вывод и обучение Fortran для науки
+
+"Обучение и развертывание суррогатных моделей нейронных сетей для вычислительной науки"
+
+Автоматическая параллелизация пакетного вывода
+
+===== Страница 30 =====
+
+Сборник инструментов Fortran
+
+Codee — Инструмент статического анализа для Fortran и C/C++
+
+Корректность кода
+
+Модернизация
+
+Канал Codee на YouTube
+
+Обучение Codee в NERSC
+
+fortran-linter
+
+rojff — JSON для Fortran (Return of JSON for Fortran) — Утилита для поддержки использования JSON-файлов в исходном коде Fortran
+
+iso_varying_string — Реализация модуля ISO_VARYING_STRING, предложенная для стандарта ISO
+
+===== Страница 31 =====
+
+FORD (Документация Fortran)
+
+Автоматический генератор документации для проектов на Fortran
+
+Может собирать документацию локально, предоставляя HTML-файлы
+
+Может развертывать документацию в Github Actions
+
+Пример документации FORD
+
+Различные инструменты для преобразования кода в фиксированной форме в код в свободной форме
+
+Сборник дополнительных инструментов — Beliavsky/Fortran-Tools
+
+===== Страница 32 =====
+
+Сообщества и где найти больше информации
+
+===== Страница 33 =====
+
+Международный орган — WG5
+
+Рабочая группа — Национальный орган INCITS США (неформально известный как J3)
+
+Предстоящие возможности:
+
+Обобщенное программирование (шаблоны и т.д.)
+
+Типобезопасные шаблоны: требования (строгие концепции)
+
+Необходимо указывать свойства типов
+
+Компилятор может выдавать сообщения об ошибках в исходном коде шаблона
+
+Асинхронность: задачи, коллективы
+
+Стандартизированный препроцессор Fortran
+
+===== Страница 34 =====
+
+Стереотипы о Fortran включают представления о нем как об устаревшем языке
+
+Существующее, активное сообщество разработчиков
+
+Для дополнительных вопросов по Fortran или чтобы взаимодействовать и делиться опытом с сообществом Fortran, посетите:
+
+Fortran Lang: fortran-lang.org
+
+Учебные пособия, ссылки на песочницы, информация о компиляторах
+
+Полезная информация и советы по языку
+
+Ссылка на LFortran, компилятор и интерпретатор Fortran
+
+Discourse: fortran-lang.discourse.group
+
+Fortran Wiki: fortranwiki.org
+
+Fortran в LBNL
+
+===== Страница 35 =====
+
+Спасибо
+
+Вопросы?
+
+Электронная почта: fortran@lbl.gov
