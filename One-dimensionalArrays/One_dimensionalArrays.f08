@@ -165,11 +165,80 @@ program One_dimensionalArrays
 
     ! ===========================================================
 
-    integer :: arr(10)
-    integer :: i, k = 20
+    ! integer :: arr(10)
+    ! integer :: i, k = 20
 
-    arr = [(i, i = 1, k)]
+    ! arr = [(i, i = 1, k)]
 
-    write(*,*) arr
+    ! write(*,*) arr
+
+    ! ===========================================================
+
+    ! integer :: arr1(4), arr2(3)
+    ! integer :: i 
+    ! real :: n 
+
+    ! do i = 1, size(arr1, dim = 1)
+    !     call random_number(n)
+    !     arr1(i) = 5 - nint(n * 10)
+    ! end do
+
+    ! write(*,*) "First array", arr1 
+
+    ! arr2(1 : 4) = arr1(1 : 4)
+    ! arr2(5 : 8) = arr1(1 : 4) * 2
+
+    ! write(*,*) "Second array", arr2
+
+    ! ===========================================================
+
+    ! integer, parameter :: array_size = 5
+    ! integer :: arr1(array_size), arr2(array_size)
+    ! integer :: i, max_value, result_value
+    ! logical :: mask_array(array_size)
+    ! real :: n 
+
+    ! result_value = 0
+
+    ! do i = 1, array_size
+    !     call random_number(n)
+    !     arr1(i) = nint(n * 10)
+
+    !     call random_number(n)
+    !     arr2(i) = nint(n * 10)
+    ! end do
+
+    ! write(*,*) "First array = ", arr1
+    ! write(*,*) "Second array = ", arr2
+
+    ! max_value = maxval(arr1)
+    ! write(*,*) "First array max value", max_value
+
+    ! mask_array = arr2 >= max_value 
+
+    ! if (any(mask_array)) then
+    !     result_value = count(mask_array)
+    ! end if
+
+    ! write(*,*) "result = ", result_value
+
+    ! ===========================================================
+
+    integer, parameter :: array_size = 6
+    integer :: arr1(array_size), arr2(array_size), arr3(array_size)
+
+    arr1 = [-3, 5, 0, -9, 15, 4]
+    arr2 = [-5, 3, 1, 2, 8, 4]
+
+    write(*,*) "arr1 = ", arr1
+    write(*,*) "arr2 = ", arr2
+
+    where (arr1 > arr1)
+        arr3 = arr1
+    else where
+        arr3 = arr2 
+    end where
+
+    write(*,*) "arr3 = ", arr3
 
 end program One_dimensionalArrays
